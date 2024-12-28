@@ -17,6 +17,16 @@ builder.Services.AddDbContext<StoreContext>(x => x.UseSqlite(_config.GetConnecti
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add HTTP and HTTPS endpoints
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5010); // HTTP
+    options.ListenAnyIP(5011, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+});
+
 var app = builder.Build();
 
 // Apply migrations on startup
@@ -48,7 +58,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseStaticFiles();
